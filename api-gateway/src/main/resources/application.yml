@@ -1,0 +1,190 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  
+  cloud:
+    gateway:
+      # Configuración global de CORS
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins:
+              - "http://localhost:3000"
+              - "http://localhost:4200"
+              - "http://localhost:8080"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
+      
+      # Definición de rutas
+      routes:
+        # ======== Rutas para Servicio Flota ========
+        - id: flota-camiones
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/flota/camiones/**
+          filters:
+            - RewritePath=/api/flota/(?<segment>.*), /api/$\{segment}
+            - name: CircuitBreaker
+              args:
+                name: flota-cb
+                fallbackUri: forward:/fallback/flota
+        
+        - id: flota-depositos
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/flota/depositos/**
+          filters:
+            - RewritePath=/api/flota/(?<segment>.*), /api/$\{segment}
+        
+        - id: flota-tarifas
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/flota/tarifas/**
+          filters:
+            - RewritePath=/api/flota/(?<segment>.*), /api/$\{segment}
+        
+        # Ruta genérica para cualquier endpoint de flota
+        - id: flota-general
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/flota/**
+          filters:
+            - RewritePath=/api/flota/(?<segment>.*), /api/$\{segment}
+        
+        # ======== Rutas para Servicio Operaciones ========
+        - id: operaciones-solicitudes
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/operaciones/solicitudes/**
+          filters:
+            - RewritePath=/api/operaciones/(?<segment>.*), /api/$\{segment}
+            - name: CircuitBreaker
+              args:
+                name: operaciones-cb
+                fallbackUri: forward:/fallback/operaciones
+        
+        - id: operaciones-seguimiento
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/operaciones/seguimiento/**
+          filters:
+            - RewritePath=/api/operaciones/(?<segment>.*), /api/$\{segment}
+        
+        - id: operaciones-clientes
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/operaciones/clientes/**
+          filters:
+            - RewritePath=/api/operaciones/(?<segment>.*), /api/$\{segment}
+        
+        - id: operaciones-contenedores
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/operaciones/contenedores/**
+          filters:
+            - RewritePath=/api/operaciones/(?<segment>.*), /api/$\{segment}
+        
+        # Ruta genérica para cualquier endpoint de operaciones
+        - id: operaciones-general
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/operaciones/**
+          filters:
+            - RewritePath=/api/operaciones/(?<segment>.*), /api/$\{segment}
+        
+        # ======== Rutas para Documentación Swagger ========
+        - id: docs-flota
+          uri: http://localhost:8081
+          predicates:
+            - Path=/docs/flota/**
+          filters:
+            - StripPrefix=2
+            - RewritePath=/docs/flota/(?<segment>.*), /$\{segment}
+        
+        - id: docs-operaciones
+          uri: http://localhost:8082
+          predicates:
+            - Path=/docs/operaciones/**
+          filters:
+            - StripPrefix=2
+            - RewritePath=/docs/operaciones/(?<segment>.*), /$\{segment}
+      
+      # Configuración por defecto
+      default-filters:
+        - name: Retry
+          args:
+            retries: 3
+            methods: GET
+            backoff:
+              firstBackoff: 50ms
+              maxBackoff: 500ms
+  
+  # Configuración de seguridad OAuth2
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/tpi-backend
+          jwk-set-uri: http://localhost:8180/realms/tpi-backend/protocol/openid-connect/certs
+
+# Configuración de logging
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.cors: DEBUG
+    com.tpi.gateway: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Información de la aplicación
+info:
+  app:
+    name: TPI API Gateway
+    description: Gateway para microservicios de transporte
+    version: 1.0.0
+
+# Configuración de SpringDoc OpenAPI
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    # Usar la URL agregada en lugar de múltiples URLs
+    url: /v3/api-docs/aggregate
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+    filter: true
+  show-actuator: false
+  use-management-port: false

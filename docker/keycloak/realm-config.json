@@ -1,0 +1,210 @@
+{
+  "realm": "tpi-backend",
+  "enabled": true,
+  "displayName": "TPI Backend Sistema de Transporte",
+  "displayNameHtml": "<b>TPI Backend</b> Sistema de Transporte",
+  "accessTokenLifespan": 3600,
+  "accessCodeLifespan": 60,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "refreshTokenMaxReuse": 0,
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN",
+        "description": "Administrador del sistema con acceso completo",
+        "composite": false
+      },
+      {
+        "name": "FLOTA_MANAGER",
+        "description": "Gestor de flota - puede administrar camiones, depósitos y tarifas",
+        "composite": false
+      },
+      {
+        "name": "OPERACIONES_MANAGER",
+        "description": "Gestor de operaciones - puede administrar solicitudes y seguimiento",
+        "composite": false
+      },
+      {
+        "name": "TRANSPORTISTA",
+        "description": "Transportista - puede ver sus asignaciones y actualizar estado de tramos",
+        "composite": false
+      },
+      {
+        "name": "USER",
+        "description": "Usuario básico del sistema",
+        "composite": false
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "tpi-api-gateway",
+      "name": "TPI API Gateway",
+      "description": "Cliente para el API Gateway del sistema TPI",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "tpi-gateway-secret-2024-secure",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "redirectUris": [
+        "http://localhost:8080/*",
+        "http://localhost:3000/*",
+        "http://localhost:4200/*"
+      ],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.lifespan": "3600",
+        "client.secret.creation.time": "1698000000"
+      },
+      "defaultRoles": ["USER"]
+    },
+    {
+      "clientId": "servicio-flota",
+      "name": "Servicio Flota",
+      "description": "Microservicio de gestión de flota",
+      "enabled": true,
+      "bearerOnly": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "servicio-operaciones",
+      "name": "Servicio Operaciones",
+      "description": "Microservicio de gestión de operaciones",
+      "enabled": true,
+      "bearerOnly": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "postman-client",
+      "name": "Postman Testing Client",
+      "description": "Cliente para testing con Postman",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "postman-secret-2024",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "publicClient": false,
+      "redirectUris": [
+        "https://oauth.pstmn.io/v1/callback",
+        "http://localhost:*"
+      ],
+      "webOrigins": ["*"]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@tpi.com",
+      "firstName": "Admin",
+      "lastName": "Sistema",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ADMIN", "FLOTA_MANAGER", "OPERACIONES_MANAGER", "USER"],
+      "clientRoles": {
+        "tpi-api-gateway": ["ADMIN"],
+        "servicio-flota": ["ADMIN"],
+        "servicio-operaciones": ["ADMIN"]
+      }
+    },
+    {
+      "username": "operador.flota",
+      "email": "operador.flota@tpi.com",
+      "firstName": "Operador",
+      "lastName": "Flota",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "flota123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["FLOTA_MANAGER", "USER"],
+      "clientRoles": {
+        "servicio-flota": ["FLOTA_MANAGER"]
+      }
+    },
+    {
+      "username": "operador.operaciones",
+      "email": "operador.operaciones@tpi.com",
+      "firstName": "Operador",
+      "lastName": "Operaciones",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "operaciones123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["OPERACIONES_MANAGER", "USER"],
+      "clientRoles": {
+        "servicio-operaciones": ["OPERACIONES_MANAGER"]
+      }
+    },
+    {
+      "username": "transportista1",
+      "email": "transportista1@tpi.com",
+      "firstName": "Juan",
+      "lastName": "Pérez",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "trans123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["TRANSPORTISTA", "USER"]
+    },
+    {
+      "username": "cliente.demo",
+      "email": "cliente@tpi.com",
+      "firstName": "Cliente",
+      "lastName": "Demo",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "cliente123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["USER"]
+    }
+  ],
+  "scopeMappings": [],
+  "clientScopeMappings": {},
+  "defaultDefaultClientScopes": [
+    "role_list",
+    "profile",
+    "email"
+  ],
+  "defaultOptionalClientScopes": [
+    "offline_access",
+    "address",
+    "phone"
+  ]
+}

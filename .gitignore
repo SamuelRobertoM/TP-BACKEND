@@ -1,0 +1,22 @@
+# Archivos generados por Maven/Build
+target/
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+
+# Archivos de configuración de IDEs y herramientas
+.idea/
+.vscode/
+*.iml
+.mvn/
+HELP.md
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# API Keys - Ignorar archivos de configuración con información sensible
+/servicio-operaciones/src/main/resources/application.properties

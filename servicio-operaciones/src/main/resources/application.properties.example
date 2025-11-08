@@ -1,0 +1,9 @@
+# Google Maps API Configuration (servicio-operaciones)
+spring.application.name=tpi-Integrador
+server.port=8082
+
+# Base URL for Google Maps Distance Matrix API
+google.maps.api.base-url=https://maps.googleapis.com
+
+# Google Maps API Key - REPLACE WITH YOUR OWN KEY
+google.maps.api.key=YOUR_API_KEY_HERE
