@@ -1,0 +1,38 @@
+# Google Maps API Configuration (servicio-operaciones)
+spring.application.name=tpi-Integrador
+server.port=8082
+
+# Base URL for Google Maps Distance Matrix API
+google.maps.base-url=https://maps.googleapis.com
+google.maps.api-key=YOUR_API_KEY_HERE
+
+# Servicio Flota Configuration
+servicio-flota.base-url=http://localhost:8081
+
+# H2 Database Configuration
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+# JPA Configuration
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# SQL Initialization - IMPORTANT: defer execution until after schema creation
+spring.sql.init.mode=always
+spring.jpa.defer-datasource-initialization=true
+
+# H2 Console (optional, for debugging)
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+# OAuth2 Resource Server Configuration
+spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8180/realms/tpi-backend
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost:8180/realms/tpi-backend/protocol/openid-connect/certs
+
+# Logging
+logging.level.org.springframework.security=DEBUG
+logging.level.utn.frc.isi.backend=DEBUG
