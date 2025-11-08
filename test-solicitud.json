@@ -1,0 +1,21 @@
+{
+  "contenedor": {
+    "numero": "CONT-TEST-001",
+    "tipo": "STANDARD",
+    "peso": 1500.5,
+    "volumen": 25.7
+  },
+  "cliente": {
+    "nombre": "Juan Pérez",
+    "email": "juan.perez@email.com",
+    "telefono": "+54-11-1234-5678",
+    "direccion": "Av. Corrientes 1234, CABA"
+  },
+  "observaciones": "Carga frágil, manejar con cuidado",
+  "direccionOrigen": "Puerto de Buenos Aires, Terminal 4",
+  "latitudOrigen": -34.6158,
+  "longitudOrigen": -58.3656,
+  "direccionDestino": "Depósito Central Rosario",
+  "latitudDestino": -32.9442,
+  "longitudDestino": -60.6505
+}

@@ -1,0 +1,271 @@
+###############################################################################
+# SCRIPT END-TO-END: FLUJO COMPLETO DE LOGÍSTICA
+# Sistema de Transporte de Contenedores
+# 
+# Prerrequisitos:
+# 1. servicio-flota debe estar corriendo en puerto 8081
+# 2. servicio-operaciones debe estar corriendo en puerto 8082
+# 3. Base de datos con data.sql cargado
+# 4. Google Maps API configurada (o mock si no tienes API key)
+#
+# Instrucciones:
+# - Ejecuta cada request en orden (Ctrl+Alt+R en VS Code con REST Client)
+# - Copia los IDs de las respuestas para usarlos en los siguientes pasos
+###############################################################################
+
+@baseUrlOperaciones = http://localhost:8082/api
+@baseUrlFlota = http://localhost:8081/api
+
+# Variables que se irán actualizando manualmente
+@solicitudId = REPLACE_WITH_SOLICITUD_ID
+@contenedorId = REPLACE_WITH_CONTENEDOR_ID
+@rutaId = REPLACE_WITH_RUTA_ID
+@tramoId = REPLACE_WITH_TRAMO_ID
+
+###############################################################################
+# PASO 1: Crear una Nueva Solicitud (RF#1)
+###############################################################################
+# POST /api/solicitudes
+# Crea una solicitud con un nuevo contenedor
+# ACCIÓN: Captura el 'id' de la respuesta y actualiza @solicitudId
+# ACCIÓN: Captura el 'contenedor.id' de la respuesta y actualiza @contenedorId
+
+POST {{baseUrlOperaciones}}/solicitudes
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "contenedor": {
+    "numero": "CONT-E2E-001",
+    "tipo": "STANDARD",
+    "estado": "EN_ORIGEN",
+    "peso": 2000.0,
+    "volumen": 15.0,
+    "clienteId": 1
+  },
+  "direccionOrigen": "Córdoba Centro, Córdoba, Argentina",
+  "latitudOrigen": -31.4135,
+  "longitudOrigen": -64.1811,
+  "direccionDestino": "Villa Carlos Paz, Córdoba, Argentina",
+  "latitudDestino": -31.4241,
+  "longitudDestino": -64.4978
+}
+
+###############################################################################
+# PASO 2: Verificar la Solicitud Creada
+###############################################################################
+# GET /api/solicitudes/{id}
+# Verifica que la solicitud se haya creado correctamente
+
+GET {{baseUrlOperaciones}}/solicitudes/{{solicitudId}}
+
+###############################################################################
+# PASO 3: Consultar Rutas Tentativas (RF#3)
+###############################################################################
+# GET /api/solicitudes/{solicitudId}/rutas/tentativas
+# Consulta las opciones de rutas calculadas con Google Maps
+# NOTA: Verifica que la respuesta contenga distancias y tiempos estimados
+
+GET {{baseUrlOperaciones}}/solicitudes/{{solicitudId}}/rutas/tentativas
+
+###############################################################################
+# PASO 4: Asignar Ruta Definitiva (RF#6)
+###############################################################################
+# POST /api/solicitudes/{solicitudId}/asignar-ruta
+# Asigna una ruta definitiva a la solicitud y crea los tramos
+# ACCIÓN: Captura el 'ruta.id' de la respuesta y actualiza @rutaId
+# ACCIÓN: Captura el primer 'tramos[0].id' de la respuesta y actualiza @tramoId
+
+POST {{baseUrlOperaciones}}/solicitudes/{{solicitudId}}/asignar-ruta
+Content-Type: application/json
+
+{
+  "origenDepositoId": 1,
+  "destinoDepositoId": 2,
+  "tramos": [
+    {
+      "origenDepositoId": 1,
+      "destinoDepositoId": 2,
+      "distanciaKm": 50.0,
+      "tiempoEstimadoHoras": 1.5,
+      "fechaEstimadaInicio": "2025-10-26T10:00:00",
+      "fechaEstimadaFin": "2025-10-26T11:30:00"
+    }
+  ]
+}
+
+###############################################################################
+# PASO 5: Verificar la Ruta Asignada
+###############################################################################
+# GET /api/solicitudes/{id}
+# Verifica que la solicitud ahora tenga estado "PROGRAMADA" y ruta asignada
+
+GET {{baseUrlOperaciones}}/solicitudes/{{solicitudId}}
+
+###############################################################################
+# PASO 6: Consultar Camiones Disponibles (servicio-flota)
+###############################################################################
+# GET /api/camiones/disponibles
+# Verifica qué camiones están disponibles para asignar
+# NOTA: Deberías ver camionId=1 (Scania R450) disponible
+
+GET {{baseUrlFlota}}/camiones/disponibles
+
+###############################################################################
+# PASO 7: Asignar Camión al Tramo (RF#6)
+###############################################################################
+# POST /api/tramos/{tramoId}/asignar-camion
+# Asigna un camión disponible al tramo
+# Esto también marca el camión como NO disponible en servicio-flota
+
+POST {{baseUrlOperaciones}}/tramos/{{tramoId}}/asignar-camion
+Content-Type: application/json
+
+{
+  "camionId": 1
+}
+
+###############################################################################
+# PASO 8: Verificar Camión Asignado
+###############################################################################
+# GET /api/tramos/{tramoId}
+# Verifica que el tramo ahora tenga estado "ASIGNADO" y camión asignado
+
+GET {{baseUrlOperaciones}}/tramos/{{tramoId}}
+
+###############################################################################
+# PASO 9: Verificar que el Camión ya NO está Disponible
+###############################################################################
+# GET /api/camiones/disponibles
+# Verifica que camionId=1 ya no aparezca en la lista de disponibles
+
+GET {{baseUrlFlota}}/camiones/disponibles
+
+###############################################################################
+# PASO 10: Iniciar el Tramo (RF#8)
+###############################################################################
+# POST /api/tramos/{tramoId}/iniciar
+# El transportista inicia el viaje
+
+POST {{baseUrlOperaciones}}/tramos/{{tramoId}}/iniciar
+
+###############################################################################
+# PASO 11: Consultar Estado del Contenedor (RF#2)
+###############################################################################
+# GET /api/contenedores/{contenedorId}/estado
+# Verifica que el estado del contenedor sea "EN_VIAJE"
+
+GET {{baseUrlOperaciones}}/contenedores/{{contenedorId}}/estado
+
+###############################################################################
+# PASO 12: Consultar Estado de la Solicitud (RF#2)
+###############################################################################
+# GET /api/solicitudes/{solicitudId}/estado
+# Verifica el progreso completo de la solicitud con detalles de tramos
+
+GET {{baseUrlOperaciones}}/solicitudes/{{solicitudId}}/estado
+
+###############################################################################
+# PASO 13: Consultar Tramos del Transportista (RF#7)
+###############################################################################
+# GET /api/tramos/transportistas/{camionId}/tramos
+# El transportista consulta sus tramos asignados
+
+GET {{baseUrlOperaciones}}/tramos/transportistas/1/tramos
+
+###############################################################################
+# PASO 14: Finalizar el Tramo (RF#8)
+###############################################################################
+# POST /api/tramos/{tramoId}/finalizar
+# El transportista marca el fin del viaje
+# Esto calcula el costo real consultando tarifas en servicio-flota
+# También libera el camión (lo marca como disponible nuevamente)
+
+POST {{baseUrlOperaciones}}/tramos/{{tramoId}}/finalizar
+
+###############################################################################
+# PASO 15: Verificar que el Camión volvió a estar Disponible
+###############################################################################
+# GET /api/camiones/disponibles
+# Verifica que camionId=1 vuelva a aparecer en la lista de disponibles
+
+GET {{baseUrlFlota}}/camiones/disponibles
+
+###############################################################################
+# PASO 16: Verificar el Tramo Finalizado
+###############################################################################
+# GET /api/tramos/{tramoId}
+# Verifica que el tramo tenga estado "FINALIZADO" y costoReal calculado
+
+GET {{baseUrlOperaciones}}/tramos/{{tramoId}}
+
+###############################################################################
+# PASO 17: Verificar Estado del Contenedor Después de Finalizar
+###############################################################################
+# GET /api/contenedores/{contenedorId}/estado
+# Verifica que el estado del contenedor sea "ENTREGADO"
+
+GET {{baseUrlOperaciones}}/contenedores/{{contenedorId}}/estado
+
+###############################################################################
+# PASO 18: Finalizar la Solicitud (RF#9)
+###############################################################################
+# PATCH /api/solicitudes/{solicitudId}/finalizar
+# Finaliza la solicitud calculando costo total y tiempo real
+# Solo funciona si TODOS los tramos están FINALIZADOS
+
+PATCH {{baseUrlOperaciones}}/solicitudes/{{solicitudId}}/finalizar
+Content-Type: application/json
+
+{
+  "observaciones": "Entrega completada exitosamente - Test E2E"
+}
+
+###############################################################################
+# PASO 19: Verificar la Solicitud Finalizada
+###############################################################################
+# GET /api/solicitudes/{solicitudId}
+# Verifica que la solicitud tenga:
+# - estado: "ENTREGADA"
+# - costoFinal: calculado (suma de costoReal de todos los tramos)
+# - tiempoReal: calculado (suma de duraciones de todos los tramos)
+
+GET {{baseUrlOperaciones}}/solicitudes/{{solicitudId}}
+
+###############################################################################
+# PASO 20: Consultar Estado Final Completo
+###############################################################################
+# GET /api/solicitudes/{solicitudId}/estado
+# Obtén el resumen final completo del transporte
+
+GET {{baseUrlOperaciones}}/solicitudes/{{solicitudId}}/estado
+
+###############################################################################
+# PASO 21 (OPCIONAL): Consultar Contenedores Pendientes (RF#5)
+###############################################################################
+# GET /api/contenedores/pendientes
+# Verifica que el contenedor E2E-001 YA NO aparezca (porque fue entregado)
+
+GET {{baseUrlOperaciones}}/contenedores/pendientes
+
+###############################################################################
+# PASO 22 (OPCIONAL): Verificar Tarifas en servicio-flota
+###############################################################################
+# GET /api/tarifas/activa
+# Consulta la tarifa activa que se usó para calcular los costos
+
+GET {{baseUrlFlota}}/tarifas/activa
+
+###############################################################################
+# ✅ FIN DEL FLUJO END-TO-END
+###############################################################################
+# Si todos los pasos se ejecutaron correctamente:
+# ✓ Solicitud creada con contenedor
+# ✓ Rutas tentativas calculadas con Google Maps
+# ✓ Ruta definitiva asignada con tramos
+# ✓ Camión asignado al tramo
+# ✓ Tramo iniciado y finalizado
+# ✓ Camión liberado
+# ✓ Solicitud finalizada con costos y tiempos calculados
+# ✓ Estado final: ENTREGADA
+###############################################################################
