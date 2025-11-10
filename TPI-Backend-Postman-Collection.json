@@ -1314,7 +1314,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"costoKmBase\": 5.0,\n  \"precioLitroCombustible\": 850.0,\n  \"cargoGestionPorTramo\": 5000.0,\n  \"costoEstadiaDiaria\": 3000.0,\n  \"vigenciaDesde\": \"2024-01-01T00:00:00\"\n}"
+                  "raw": "{\n  \"costoKmBase\": 5.0,\n  \"precioLitroCombustible\": 850.0,\n  \"cargoGestionPorTramo\": 5000.0,\n  \"costoEstadiaDiaria\": 3000.0,\n  \"vigenciaDesde\": \"2020-01-01T00:00:00\"\n}"
                 },
                 "url": {
                   "raw": "{{gateway_url}}/api/flota/tarifas",
@@ -3332,7 +3332,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"costoKmBase\": 5.0,\n  \"precioLitroCombustible\": 850.0,\n  \"cargoGestionPorTramo\": 5000.0,\n  \"costoEstadiaDiaria\": 3000.0,\n  \"vigenciaDesde\": \"2024-01-01T00:00:00\"\n}"
+              "raw": "{\n  \"costoKmBase\": 5.0,\n  \"precioLitroCombustible\": 850.0,\n  \"cargoGestionPorTramo\": 5000.0,\n  \"costoEstadiaDiaria\": 3000.0,\n  \"vigenciaDesde\": \"2020-01-01T00:00:00\"\n}"
             },
             "url": {
               "raw": "{{gateway_url}}/api/flota/tarifas",
@@ -5428,7 +5428,7 @@
                 "header": [{"key": "Content-Type", "value": "application/json"}],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"costoKmBase\": 5.0,\n  \"precioLitroCombustible\": 850.0,\n  \"cargoGestionPorTramo\": 5000.0,\n  \"costoEstadiaDiaria\": 3000.0,\n  \"vigenciaDesde\": \"2024-12-01T00:00:00\"\n}"
+                  "raw": "{\n  \"costoKmBase\": 5.0,\n  \"precioLitroCombustible\": 850.0,\n  \"cargoGestionPorTramo\": 5000.0,\n  \"costoEstadiaDiaria\": 3000.0,\n  \"vigenciaDesde\": \"2020-01-01T00:00:00\"\n}"
                 },
                 "url": {
                   "raw": "{{gateway_url}}/api/flota/tarifas",

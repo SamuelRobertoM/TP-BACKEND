@@ -31,10 +31,10 @@ VALUES ('Depósito Rosario Norte', 'Ruta Nacional 9 Km 305, Rosario, Santa Fe, A
 -- ============================================
 -- TARIFAS
 -- ============================================
--- Tarifa 1: Activa - Vigente desde 2024
+-- Tarifa 1: Activa - Vigente desde 2020 (fecha antigua para testing genérico)
 INSERT INTO tarifas (costo_km_base, precio_litro_combustible, cargo_gestion_por_tramo, costo_estadia_diaria, vigencia_desde, vigencia_hasta, activa) 
-VALUES (100.0, 850.0, 5000.0, 2500.0, '2024-01-01 00:00:00', NULL, true);
+VALUES (100.0, 850.0, 5000.0, 2500.0, '2020-01-01 00:00:00', NULL, true);
 
 -- Tarifa 2: Inactiva - Tarifa antigua (ejemplo histórico)
 INSERT INTO tarifas (costo_km_base, precio_litro_combustible, cargo_gestion_por_tramo, costo_estadia_diaria, vigencia_desde, vigencia_hasta, activa) 
-VALUES (80.0, 700.0, 4000.0, 2000.0, '2023-01-01 00:00:00', '2023-12-31 23:59:59', false);
+VALUES (80.0, 700.0, 4000.0, 2000.0, '2019-01-01 00:00:00', '2019-12-31 23:59:59', false);

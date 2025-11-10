@@ -32,7 +32,7 @@ public class FlotaServiceClient {
      * @return Optional con TarifaDTO si existe una tarifa activa
      */
     public Optional<TarifaDTO> obtenerTarifaActiva() {
-        String uri = "/tarifas/actual";
+        String uri = "/api/tarifas/actual";
         try {
             logger.debug("Consultando tarifa activa a servicio-flota: {}", uri);
             
@@ -61,7 +61,7 @@ public class FlotaServiceClient {
      * @return Optional con CamionDTO si el camión existe
      */
     public Optional<CamionDTO> obtenerCamionPorId(Long camionId) {
-        String uri = "/camiones/{camionId}";
+        String uri = "/api/camiones/{camionId}";
         try {
             logger.debug("Consultando camión {} a servicio-flota", camionId);
             
@@ -99,7 +99,7 @@ public class FlotaServiceClient {
      * @throws RuntimeException si la actualización falla
      */
     public void actualizarDisponibilidadCamion(Long camionId, boolean disponible) {
-        String uri = "/camiones/{camionId}/disponibilidad";
+        String uri = "/api/camiones/{camionId}/disponibilidad";
         try {
             logger.debug("Actualizando disponibilidad del camión {} a: {}", camionId, disponible);
             
