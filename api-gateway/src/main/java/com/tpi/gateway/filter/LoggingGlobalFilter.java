@@ -1,7 +1,6 @@
 package com.tpi.gateway.filter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -11,6 +10,8 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
@@ -28,11 +29,10 @@ import java.util.UUID;
  * 
  * @author TPI Backend Team
  */
+@Slf4j
 @Component
 public class LoggingGlobalFilter implements GlobalFilter, Ordered {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoggingGlobalFilter.class);
-
+    
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         long startTime = System.currentTimeMillis();
@@ -50,7 +50,7 @@ public class LoggingGlobalFilter implements GlobalFilter, Ordered {
             .build();
         
         // Log inicial
-        logger.info("🔵 [{}] Incoming request: {} {} from {}",
+        log.info("🔵 [{}] Incoming request: {} {} from {}",
             requestId,
             request.getMethod(),
             request.getPath(),
@@ -62,18 +62,18 @@ public class LoggingGlobalFilter implements GlobalFilter, Ordered {
             .defaultIfEmpty(new NoAuthentication())
             .flatMap(auth -> {
                 if (auth.isAuthenticated() && !(auth instanceof NoAuthentication)) {
-                    logger.info("🔐 [{}] Authenticated user: {} with roles: {}",
+                    log.info("🔐 [{}] Authenticated user: {} with roles: {}",
                         requestId,
                         auth.getName(),
                         auth.getAuthorities());
                 } else {
-                    logger.info("🔓 [{}] Unauthenticated request", requestId);
+                    log.info("🔓 [{}] Unauthenticated request", requestId);
                 }
                 
                 return chain.filter(modifiedExchange)
                     .doFinally(signalType -> {
                         long duration = System.currentTimeMillis() - startTime;
-                        logger.info("🟢 [{}] Request completed in {}ms with status: {}",
+                        log.info("🟢 [{}] Request completed in {}ms with status: {}",
                             requestId,
                             duration,
                             exchange.getResponse().getStatusCode());
