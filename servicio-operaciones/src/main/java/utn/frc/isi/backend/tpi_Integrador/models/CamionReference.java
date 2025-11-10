@@ -14,11 +14,15 @@ public class CamionReference {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Indica que el ID será autogenerado por la base de datos
     private Long id;
 
+    private Long camionIdFlota; // ID del camión en el servicio-flota (para consultas)
+
     private String dominio; // Patente o identificador único del camión
     
     private double capacidadPeso; // Capacidad de carga en kg
     
     private double capacidadVolumen; // Capacidad de volumen en m³
+    
+    private double costoPorKm; // Costo por kilómetro del camión
     
     private boolean disponible; // Indica si el camión está disponible para asignación
 

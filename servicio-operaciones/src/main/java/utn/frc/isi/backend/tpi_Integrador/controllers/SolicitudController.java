@@ -48,22 +48,6 @@ public class SolicitudController {
         return ResponseEntity.ok(solicitudes);
     }
 
-    @Operation(summary = "Obtener una solicitud por ID", 
-               description = "Busca y devuelve una solicitud específica mediante su identificador único")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Solicitud encontrada y devuelta",
-                     content = @Content(mediaType = "application/json",
-                     schema = @Schema(implementation = SolicitudDTO.class))),
-        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada",
-                     content = @Content)
-    })
-    @GetMapping("/{id}")
-    public ResponseEntity<SolicitudDTO> obtenerPorId(@PathVariable Long id) {
-        return solicitudService.obtenerPorId(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
     @Operation(summary = "Crear nueva solicitud de transporte (RF#1)", 
                description = "Endpoint principal del sistema que orquesta la creación completa de una solicitud de transporte incluyendo cliente, contenedor y ruta")
     @ApiResponses(value = {
@@ -87,40 +71,7 @@ public class SolicitudController {
         }
     }
 
-    @Operation(summary = "Actualizar una solicitud existente", 
-               description = "Modifica los datos de una solicitud registrada en el sistema")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Solicitud actualizada exitosamente",
-                     content = @Content(mediaType = "application/json",
-                     schema = @Schema(implementation = SolicitudDTO.class))),
-        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada",
-                     content = @Content),
-        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
-                     content = @Content)
-    })
-    @PutMapping("/{id}")
-    public ResponseEntity<SolicitudDTO> actualizarSolicitud(@PathVariable Long id, @Valid @RequestBody SolicitudUpdateDTO solicitud) {
-        SolicitudDTO solicitudActualizada = solicitudService.actualizarSolicitud(id, solicitud);
-        if (solicitudActualizada != null) {
-            return ResponseEntity.ok(solicitudActualizada);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @Operation(summary = "Eliminar una solicitud", 
-               description = "Elimina una solicitud del sistema de forma permanente")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Solicitud eliminada exitosamente",
-                     content = @Content),
-        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada",
-                     content = @Content)
-    })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarSolicitud(@PathVariable Long id) {
-        solicitudService.eliminarSolicitud(id);
-        return ResponseEntity.noContent().build();
-    }
+    // ========== ENDPOINTS ESPECÍFICOS (deben ir ANTES de /{id}) ==========
     
     @Operation(summary = "Consultar estado completo del transporte (RF#2)", 
                description = "Permite al cliente consultar el estado detallado de su solicitud, incluyendo ubicación del contenedor, progreso de tramos y tiempo estimado de llegada")
@@ -208,5 +159,58 @@ public class SolicitudController {
             // Otros errores
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    // ========== ENDPOINTS GENÉRICOS (deben ir DESPUÉS de los específicos) ==========
+
+    @Operation(summary = "Obtener una solicitud por ID", 
+               description = "Busca y devuelve una solicitud específica mediante su identificador único")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Solicitud encontrada y devuelta",
+                     content = @Content(mediaType = "application/json",
+                     schema = @Schema(implementation = SolicitudDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada",
+                     content = @Content)
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<SolicitudDTO> obtenerPorId(@PathVariable Long id) {
+        return solicitudService.obtenerPorId(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "Actualizar una solicitud existente", 
+               description = "Modifica los datos de una solicitud registrada en el sistema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Solicitud actualizada exitosamente",
+                     content = @Content(mediaType = "application/json",
+                     schema = @Schema(implementation = SolicitudDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada",
+                     content = @Content),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                     content = @Content)
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<SolicitudDTO> actualizarSolicitud(@PathVariable Long id, @Valid @RequestBody SolicitudUpdateDTO solicitud) {
+        SolicitudDTO solicitudActualizada = solicitudService.actualizarSolicitud(id, solicitud);
+        if (solicitudActualizada != null) {
+            return ResponseEntity.ok(solicitudActualizada);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Eliminar una solicitud", 
+               description = "Elimina una solicitud del sistema de forma permanente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Solicitud eliminada exitosamente",
+                     content = @Content),
+        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada",
+                     content = @Content)
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarSolicitud(@PathVariable Long id) {
+        solicitudService.eliminarSolicitud(id);
+        return ResponseEntity.noContent().build();
     }
 }

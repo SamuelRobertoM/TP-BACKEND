@@ -19,6 +19,18 @@ public class RutaDTO {
     
     private Long solicitudId; // ID de la solicitud asociada
     
+    private String origen; // Dirección de origen
+    
+    private String destino; // Dirección de destino
+    
+    private Double latitudOrigen; // Latitud del origen
+    
+    private Double longitudOrigen; // Longitud del origen
+    
+    private Double latitudDestino; // Latitud del destino
+    
+    private Double longitudDestino; // Longitud del destino
+    
     private int cantidadTramos; // Cantidad de tramos en la ruta
     
     private int cantidadDepositos; // Cantidad de depósitos intermedios
