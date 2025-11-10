@@ -267,9 +267,13 @@ public class TramoService {
             throw new RuntimeException("El tramo no tiene un camión asignado");
         }
         
-        Long camionId = tramo.getCamionReference().getId();
-        CamionDTO camion = flotaServiceClient.obtenerCamionPorId(camionId)
-                .orElseThrow(() -> new RuntimeException("No se pudo obtener los datos del camión ID: " + camionId));
+        Long camionIdFlota = tramo.getCamionReference().getCamionIdFlota();
+        if (camionIdFlota == null) {
+            throw new RuntimeException("La referencia del camión no tiene el ID del servicio de flota");
+        }
+        
+        CamionDTO camion = flotaServiceClient.obtenerCamionPorId(camionIdFlota)
+                .orElseThrow(() -> new RuntimeException("No se pudo obtener los datos del camión ID: " + camionIdFlota));
         logger.debug("Camión obtenido: consumo={} L/km, costoPorKm={}", 
                     camion.getConsumoCombustiblePorKm(), camion.getCostoPorKm());
         
@@ -301,41 +305,27 @@ public class TramoService {
         tramo.setEstado("FINALIZADO");
         tramo.setFechaRealFin(LocalDateTime.now());
         
-        // 5. Buscar solicitud asociada
+        // 5. Si el tramo termina en depósito intermedio, actualizar estado del contenedor
         Solicitud solicitud = solicitudRepository.findByRuta(tramo.getRuta())
                 .orElseThrow(() -> new RuntimeException("No se encontró solicitud asociada al tramo"));
         
-        // 6. Verificar si es el último tramo de la ruta
-        List<Tramo> tramosRuta = tramoRepository.findByRutaOrderByOrdenAsc(tramo.getRuta());
-        boolean todosFinalizados = tramosRuta.stream()
-                .allMatch(t -> "FINALIZADO".equals(t.getEstado()) || t.getId().equals(tramoId));
-        
-        // 7. Si todos los tramos están finalizados, actualizar contenedor y solicitud
-        if (todosFinalizados) {
+        if (tramo.getTipo().contains("DEPOSITO")) {
             Contenedor contenedor = solicitud.getContenedor();
-            contenedor.setEstado("ENTREGADO");
+            contenedor.setEstado("EN_DEPOSITO");
             contenedorRepository.save(contenedor);
-            
-            solicitud.setEstado("ENTREGADA");
-            solicitudRepository.save(solicitud);
-            
-            logger.info("Ruta completada. Solicitud {} marcada como ENTREGADA", solicitud.getId());
-        } else {
-            // Si no es el último, marcar contenedor como en depósito intermedio
-            Contenedor contenedor = solicitud.getContenedor();
-            if (tramo.getTipo().contains("DEPOSITO")) {
-                contenedor.setEstado("EN_DEPOSITO");
-                contenedorRepository.save(contenedor);
-            }
+            logger.info("Contenedor {} marcado como EN_DEPOSITO en tramo intermedio", contenedor.getId());
         }
+        
+        // NOTA: La solicitud se finalizará explícitamente con el endpoint PATCH /solicitudes/{id}/finalizar
+        // cuando TODOS los tramos estén finalizados. Esto permite al usuario revisar antes de cerrar.
         
         // 8. Guardar el tramo actualizado
         Tramo tramoGuardado = tramoRepository.save(tramo);
         
         // 9. Liberar el camión en servicio-flota (marca como disponible)
         try {
-            flotaServiceClient.actualizarDisponibilidadCamion(camionId, true);
-            logger.info("Camión ID {} marcado como disponible en servicio-flota", camionId);
+            flotaServiceClient.actualizarDisponibilidadCamion(camionIdFlota, true);
+            logger.info("Camión ID {} marcado como disponible en servicio-flota", camionIdFlota);
         } catch (Exception e) {
             logger.warn("No se pudo actualizar disponibilidad del camión en servicio-flota: {}", e.getMessage());
             // Fallback: actualizar la referencia local

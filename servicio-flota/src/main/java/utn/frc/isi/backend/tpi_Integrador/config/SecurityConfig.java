@@ -68,6 +68,9 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-resources/**").permitAll()
                 .requestMatchers("/webjars/**").permitAll()
                 
+                // Endpoint público para consulta de tarifa activa (usado por otros microservicios)
+                .requestMatchers(HttpMethod.GET, "/api/tarifas/actual").permitAll()
+                
                 // ===== Endpoints de API =====
                 // Lectura (GET) - cualquier usuario autenticado
                 .requestMatchers(HttpMethod.GET, "/api/**")

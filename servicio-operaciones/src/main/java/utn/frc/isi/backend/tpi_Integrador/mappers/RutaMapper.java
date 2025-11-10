@@ -38,6 +38,12 @@ public class RutaMapper {
 
         RutaDTO dto = new RutaDTO();
         dto.setId(ruta.getId());
+        dto.setOrigen(ruta.getOrigen());
+        dto.setDestino(ruta.getDestino());
+        dto.setLatitudOrigen(ruta.getLatitudOrigen());
+        dto.setLongitudOrigen(ruta.getLongitudOrigen());
+        dto.setLatitudDestino(ruta.getLatitudDestino());
+        dto.setLongitudDestino(ruta.getLongitudDestino());
         
         // Obtener los tramos asociados a esta ruta
         List<Tramo> tramos = tramoRepository.findByRutaId(ruta.getId());

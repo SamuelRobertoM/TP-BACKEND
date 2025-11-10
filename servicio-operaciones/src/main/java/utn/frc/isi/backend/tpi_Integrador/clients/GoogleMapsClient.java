@@ -29,7 +29,7 @@ public class GoogleMapsClient {
     }
 
     public Optional<Element> getDistance(String origen, String destino) {
-        String uri = "/distancematrix/json?origins={origen}&destinations={destino}&units=metric&key={apiKey}";
+        String uri = "/maps/api/distancematrix/json?origins={origen}&destinations={destino}&units=metric&key={apiKey}";
 
         try {
             // Realizar la llamada GET a la API de Google Maps

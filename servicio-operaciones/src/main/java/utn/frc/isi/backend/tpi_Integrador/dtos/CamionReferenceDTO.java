@@ -13,9 +13,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CamionReferenceDTO {
     private Long id;
+    private Long camionIdFlota;
     private String dominio;
     private String nombreTransportista;
     private boolean disponible;
     private double capacidadPeso;
     private double capacidadVolumen;
+    private double costoPorKm;
 }
