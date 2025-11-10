@@ -1,7 +1,6 @@
 package utn.frc.isi.backend.tpi_Integrador.clients;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -14,10 +13,10 @@ import utn.frc.isi.backend.tpi_Integrador.dtos.googlemaps.GoogleDistanceMatrixRe
 
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class GoogleMapsClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(GoogleMapsClient.class);
 
     private final RestClient restClient;
     private final String apiKey;
@@ -55,26 +54,26 @@ public class GoogleMapsClient {
 
                     // Validar el estado del elemento
                     if ("OK".equals(element.getStatus())) {
-                        logger.info("Distancia obtenida exitosamente de {} a {}", origen, destino);
+                        log.info("Distancia obtenida exitosamente de {} a {}", origen, destino);
                         return Optional.of(element);
                     } else {
-                        logger.warn("Estado del elemento no OK: {} para ruta {} -> {}", 
+                        log.warn("Estado del elemento no OK: {} para ruta {} -> {}", 
                                   element.getStatus(), origen, destino);
                     }
                 } else {
-                    logger.warn("Respuesta de API inválida: status={}, rows vacíos o elementos vacíos para {} -> {}", 
+                    log.warn("Respuesta de API inválida: status={}, rows vacíos o elementos vacíos para {} -> {}", 
                               body.getStatus(), origen, destino);
                 }
             } else {
-                logger.error("Respuesta HTTP no OK: {} para {} -> {}", 
+                log.error("Respuesta HTTP no OK: {} para {} -> {}", 
                            response.getStatusCode(), origen, destino);
             }
 
         } catch (HttpClientErrorException e) {
-            logger.error("Error HTTP al llamar a Google Maps API: {} - {}", 
+            log.error("Error HTTP al llamar a Google Maps API: {} - {}", 
                        e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            logger.error("Error inesperado al llamar a Google Maps API: {}", e.getMessage(), e);
+            log.error("Error inesperado al llamar a Google Maps API: {}", e.getMessage(), e);
         }
 
         return Optional.empty();
