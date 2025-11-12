@@ -152,16 +152,18 @@ public class SolicitudService {
             cliente = clienteRepository.save(dto.getCliente());
         }
 
-        // 2. Crear el Contenedor
-        Contenedor nuevoContenedor = new Contenedor();
-        nuevoContenedor.setNumero(dto.getContenedor().getNumero());
-        nuevoContenedor.setTipo(dto.getContenedor().getTipo());
-        nuevoContenedor.setPeso(dto.getContenedor().getPeso());
-        nuevoContenedor.setVolumen(dto.getContenedor().getVolumen());
-        nuevoContenedor.setCliente(cliente); // Asociar el contenedor al cliente
-        nuevoContenedor.setEstado("EN_ORIGEN"); // Estado inicial del contenedor
-        
-        Contenedor contenedorGuardado = contenedorRepository.save(nuevoContenedor);
+        // 2. Buscar el Contenedor existente
+        Contenedor contenedor = contenedorRepository.findById(dto.getContenedorId())
+                .orElseThrow(() -> new RuntimeException("Contenedor no encontrado con ID: " + dto.getContenedorId()));
+
+        // Validar que el contenedor pertenece al cliente
+        if (!contenedor.getCliente().getId().equals(dto.getClienteId())) {
+            throw new RuntimeException("El contenedor no pertenece al cliente especificado");
+        }
+
+        // Actualizar el estado del contenedor
+        contenedor.setEstado("EN_ORIGEN");
+        Contenedor contenedorGuardado = contenedorRepository.save(contenedor);
 
         // 3. Crear la Ruta
         Ruta nuevaRuta = new Ruta();

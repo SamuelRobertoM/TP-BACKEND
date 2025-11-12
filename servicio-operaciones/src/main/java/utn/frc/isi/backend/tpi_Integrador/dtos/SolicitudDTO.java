@@ -16,8 +16,8 @@ public class SolicitudDTO {
     private String fechaSolicitud;
     private String estado;
     private String observaciones;
-    private ContenedorDTO contenedor; // Relación con Contenedor
-    private ClienteDTO cliente; // Relación con Cliente
+    private Long contenedorId; // Solo el ID del contenedor
+    private Long clienteId; // Solo el ID del cliente
     private RutaDTO ruta; // Relación con Ruta
     private double costoEstimado;
     private double tiempoEstimado;

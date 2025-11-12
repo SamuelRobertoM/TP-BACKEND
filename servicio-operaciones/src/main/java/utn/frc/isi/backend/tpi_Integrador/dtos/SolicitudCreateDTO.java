@@ -16,9 +16,8 @@ import utn.frc.isi.backend.tpi_Integrador.models.Cliente;
 @AllArgsConstructor
 public class SolicitudCreateDTO {
 
-    @NotNull(message = "Los datos del contenedor son requeridos")
-    @Valid
-    private ContenedorCreateDTO contenedor; // REQUERIDO - Se crea el contenedor
+    @NotNull(message = "El ID del contenedor es requerido")
+    private Long contenedorId; // REQUERIDO - ID del contenedor existente
 
     // Cliente nuevo (si es cliente nuevo)
     @Valid

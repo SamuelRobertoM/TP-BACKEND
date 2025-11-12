@@ -3498,35 +3498,27 @@
           "response": []
         },
         {
-          "name": "6. Create Solicitud con Contenedor",
+          "name": "6. Create Contenedor",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('[E2E Step 6] Solicitud created successfully', function () {",
+                  "pm.test('[E2E Step 6] Contenedor created successfully', function () {",
                   "    pm.response.to.have.status(201);",
-                  "    const solicitud = pm.response.json();",
-                  "    pm.expect(solicitud).to.have.property('id');",
-                  "    pm.expect(solicitud).to.have.property('numero');",
-                  "    pm.expect(solicitud.estado).to.equal('BORRADOR');",
-                  "});",
-                  "",
-                  "pm.test('[E2E Step 6] Contenedor created with solicitud', function () {",
-                  "    const solicitud = pm.response.json();",
-                  "    pm.expect(solicitud).to.have.property('contenedor');",
-                  "    pm.expect(solicitud.contenedor).to.have.property('id');",
+                  "    const contenedor = pm.response.json();",
+                  "    pm.expect(contenedor).to.have.property('id');",
+                  "    pm.expect(contenedor).to.have.property('numero');",
+                  "    pm.expect(contenedor.estado).to.equal('DISPONIBLE');",
                   "});",
                   "",
                   "if (pm.response.code === 201) {",
-                  "    const solicitud = pm.response.json();",
-                  "    pm.environment.set('solicitud_id', solicitud.id);",
-                  "    pm.environment.set('contenedor_id', solicitud.contenedor.id);",
-                  "    console.log('✅ [E2E Step 6/12] Solicitud created - ID: ' + solicitud.id + ', Numero: ' + solicitud.numero);",
-                  "    console.log('   Contenedor ID: ' + solicitud.contenedor.id + ', Estado: ' + solicitud.estado);",
+                  "    const contenedor = pm.response.json();",
+                  "    pm.environment.set('contenedor_id', contenedor.id);",
+                  "    console.log('✅ [E2E Step 6/13] Contenedor created - ID: ' + contenedor.id + ', Numero: ' + contenedor.numero);",
                   "} else {",
-                  "    console.log('❌ [E2E Step 6/12] Failed to create solicitud');",
+                  "    console.log('❌ [E2E Step 6/13] Failed to create contenedor');",
                   "}"
                 ]
               }
@@ -3542,7 +3534,71 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contenedor\": {\n    \"numero\": \"CONT-E2E-{{$timestamp}}\",\n    \"tipo\": \"STANDARD\",\n    \"peso\": 15000,\n    \"volumen\": 30,\n    \"clienteId\": {{cliente_id}},\n    \"estado\": \"DISPONIBLE\"\n  },\n  \"clienteId\": {{cliente_id}},\n  \"direccionOrigen\": \"Córdoba, Argentina\",\n  \"latitudOrigen\": -31.4201,\n  \"longitudOrigen\": -64.1888,\n  \"direccionDestino\": \"Buenos Aires, Argentina\",\n  \"latitudDestino\": -34.6037,\n  \"longitudDestino\": -58.3816,\n  \"observaciones\": \"Solicitud E2E Test - Flujo completo automatizado\"\n}"
+              "raw": "{\n  \"numero\": \"CONT-E2E-{{$timestamp}}\",\n  \"tipo\": \"STANDARD\",\n  \"peso\": 15000,\n  \"volumen\": 30,\n  \"clienteId\": {{cliente_id}},\n  \"estado\": \"DISPONIBLE\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/operaciones/contenedores",
+              "host": [
+                "{{gateway_url}}"
+              ],
+              "path": [
+                "api", "operaciones", "contenedores"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Create Solicitud con Contenedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[E2E Step 7] Solicitud created successfully', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const solicitud = pm.response.json();",
+                  "    pm.expect(solicitud).to.have.property('id');",
+                  "    pm.expect(solicitud).to.have.property('numero');",
+                  "    pm.expect(solicitud.estado).to.equal('BORRADOR');",
+                  "});",
+                  "",
+                  "pm.test('[E2E Step 7] Solicitud has contenedorId', function () {",
+                  "    const solicitud = pm.response.json();",
+                  "    pm.expect(solicitud).to.have.property('contenedor');",
+                  "    pm.expect(solicitud.contenedor).to.have.property('id');",
+                  "});",
+                  "",
+                  "pm.test('[E2E Step 7] Solicitud has only clienteId (not full object)', function () {",
+                  "    const solicitud = pm.response.json();",
+                  "    pm.expect(solicitud).to.have.property('clienteId');",
+                  "    pm.expect(solicitud.clienteId).to.be.a('number');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const solicitud = pm.response.json();",
+                  "    pm.environment.set('solicitud_id', solicitud.id);",
+                  "    console.log('✅ [E2E Step 7/13] Solicitud created - ID: ' + solicitud.id + ', Numero: ' + solicitud.numero);",
+                  "    console.log('   Contenedor ID: ' + solicitud.contenedor.id + ', Cliente ID: ' + solicitud.clienteId + ', Estado: ' + solicitud.estado);",
+                  "} else {",
+                  "    console.log('❌ [E2E Step 7/13] Failed to create solicitud');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenedorId\": {{contenedor_id}},\n  \"clienteId\": {{cliente_id}},\n  \"direccionOrigen\": \"Córdoba, Argentina\",\n  \"latitudOrigen\": -31.4201,\n  \"longitudOrigen\": -64.1888,\n  \"direccionDestino\": \"Buenos Aires, Argentina\",\n  \"latitudDestino\": -34.6037,\n  \"longitudDestino\": -58.3816,\n  \"observaciones\": \"Solicitud E2E Test - Flujo completo automatizado\"\n}"
             },
             "url": {
               "raw": "{{gateway_url}}/api/operaciones/solicitudes",
@@ -3557,7 +3613,7 @@
           "response": []
         },
         {
-          "name": "7. Get Rutas Tentativas (Google Maps)",
+          "name": "8. Get Rutas Tentativas (Google Maps)",
           "event": [
             {
               "listen": "test",
@@ -3583,12 +3639,12 @@
                   "if (pm.response.code === 200) {",
                   "    const rutas = pm.response.json();",
                   "    const ruta = rutas[0];",
-                  "    console.log('✅ [E2E Step 7/12] Rutas tentativas calculated via Google Maps');",
+                  "    console.log('✅ [E2E Step 8/13] Rutas tentativas calculated via Google Maps');",
                   "    console.log('   Distancia Total: ' + ruta.distanciaTotal + ' km');",
                   "    console.log('   Tiempo Estimado: ' + ruta.tiempoEstimadoTotal + ' horas');",
                   "    console.log('   Tramos: ' + ruta.tramos.length);",
                   "} else {",
-                  "    console.log('❌ [E2E Step 7/12] Failed to get rutas tentativas');",
+                  "    console.log('❌ [E2E Step 8/13] Failed to get rutas tentativas');",
                   "}"
                 ]
               }
@@ -3613,7 +3669,7 @@
           "response": []
         },
         {
-          "name": "8. Asignar Ruta",
+          "name": "9. Asignar Ruta",
           "event": [
             {
               "listen": "test",
@@ -3640,12 +3696,12 @@
                   "    const ruta = pm.response.json();",
                   "    pm.environment.set('ruta_id', ruta.id);",
                   "    pm.environment.set('tramo_id', ruta.tramos[0].id);",
-                  "    console.log('✅ [E2E Step 8/12] Ruta assigned - ID: ' + ruta.id);",
+                  "    console.log('✅ [E2E Step 9/13] Ruta assigned - ID: ' + ruta.id);",
                   "    console.log('   Distancia Total: ' + ruta.distanciaTotal + ' km');",
                   "    console.log('   Tramos created: ' + ruta.tramos.length);",
                   "    console.log('   First Tramo ID: ' + ruta.tramos[0].id);",
                   "} else {",
-                  "    console.log('❌ [E2E Step 8/12] Failed to assign ruta');",
+                  "    console.log('❌ [E2E Step 9/13] Failed to assign ruta');",
                   "}"
                 ]
               }

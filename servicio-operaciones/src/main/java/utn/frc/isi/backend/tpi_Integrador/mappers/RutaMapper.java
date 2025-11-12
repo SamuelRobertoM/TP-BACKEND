@@ -49,7 +49,7 @@ public class RutaMapper {
         List<Tramo> tramos = tramoRepository.findByRutaId(ruta.getId());
         
         // Calcular campos derivados
-        dto.setSolicitudId(null); // Se setea externamente si es necesario
+        dto.setSolicitudId(null); // La relación no es bidireccional, se setea externamente
         dto.setCantidadTramos(tramos.size());
         dto.setCantidadDepositos((int) tramos.stream()
                 .filter(t -> t.getDepositoOrigen() != null || t.getDepositoDestino() != null)

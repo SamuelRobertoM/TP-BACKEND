@@ -2,6 +2,7 @@ package utn.frc.isi.backend.tpi_Integrador.mappers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import utn.frc.isi.backend.tpi_Integrador.dtos.RutaDTO;
 import utn.frc.isi.backend.tpi_Integrador.dtos.SolicitudCreateDTO;
 import utn.frc.isi.backend.tpi_Integrador.dtos.SolicitudDTO;
 import utn.frc.isi.backend.tpi_Integrador.dtos.SolicitudUpdateDTO;
@@ -47,10 +48,16 @@ public class SolicitudMapper {
         dto.setCostoFinal(solicitud.getCostoFinal());
         dto.setTiempoReal(solicitud.getTiempoReal());
         
-        // Convertir relaciones
-        dto.setContenedor(contenedorMapper.toDTO(solicitud.getContenedor()));
-        dto.setCliente(clienteMapper.toDTO(solicitud.getCliente()));
-        dto.setRuta(rutaMapper.toDTO(solicitud.getRuta()));
+        // Convertir relaciones - Solo IDs
+        dto.setContenedorId(solicitud.getContenedor().getId()); // Solo el ID
+        dto.setClienteId(solicitud.getCliente().getId()); // Solo el ID
+        
+        // Mapear ruta y setear solicitudId manualmente (relación no bidireccional)
+        RutaDTO rutaDTO = rutaMapper.toDTO(solicitud.getRuta());
+        if (rutaDTO != null) {
+            rutaDTO.setSolicitudId(solicitud.getId());
+        }
+        dto.setRuta(rutaDTO);
 
         return dto;
     }
