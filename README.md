@@ -4,24 +4,17 @@ Sistema de microservicios para gestión de transporte de contenedores con cálcu
 
 ## Arquitectura
 
-```
-┌─────────────┐
-│   Keycloak  │ (Puerto 8180)
-│   Auth      │
-└─────────────┘
-       │
-       ↓
-┌─────────────┐
-│ API Gateway │ (Puerto 8080)
-└─────────────┘
-       │
-       ├──────────────────┬──────────────────┐
-       ↓                  ↓                  ↓
-┌──────────────┐   ┌──────────────┐   ┌──────────────┐
-│   Servicio   │   │   Servicio   │   │  Google Maps │
-│    Flota     │←──│  Operaciones │───│     API      │
-│ (Puerto 8081)│   │ (Puerto 8082)│   └──────────────┘
-└──────────────┘   └──────────────┘
+```mermaid
+graph TB
+    Client[Client/Frontend] --> Gateway[API Gateway :8080]
+    Gateway --> Auth[Keycloak Server :8180]
+    Gateway --> Fleet[Fleet Service :8081]
+    Gateway --> Ops[Operations Service :8082]
+    Auth --> DB1[(PostgreSQL)]
+    Fleet --> DB2[(H2 Database)]
+    Ops --> DB3[(H2 Database)]
+    Ops --> Maps[Google Maps API]
+    Ops --> Fleet
 ```
 
 ## Servicios
