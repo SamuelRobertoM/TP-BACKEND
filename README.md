@@ -110,7 +110,6 @@ El costo de cada tramo se calcula con:
 
 ## Documentación Adicional
 
-- [CORRECCIONES-IMPLEMENTADAS.md](CORRECCIONES-IMPLEMENTADAS.md) - Cambios realizados para el funcionamiento correcto
 - [POSTMAN-GUIA.md](POSTMAN-GUIA.md) - Guía de uso de la colección Postman
 - [Endpoints-Documentacion.md](Endpoints-Documentacion.md) - Documentación detallada de endpoints
 
